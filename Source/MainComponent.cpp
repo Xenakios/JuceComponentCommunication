@@ -14,9 +14,6 @@ MainComponent::MainComponent() :
 	m_table_passowner1(*this),
 	m_table_passowner2(*this)
 {
-	addAndMakeVisible(m_test1);
-	addAndMakeVisible(m_test2);
-	addAndMakeVisible(m_test3);
 	addAndMakeVisible(m_table_broadcaster1);
 	m_table_broadcaster1.addListener(this);
 	m_table_broadcaster1.setName("broadcasterlistbox1"); 
@@ -24,16 +21,17 @@ MainComponent::MainComponent() :
 	m_table_broadcaster2.addListener(this);
 	m_table_broadcaster2.setName("broadcasterlistbox2");
 	
+	// Callback used for ListBoxExample_StdFunction instances
 	auto callback = [this](ListBoxExample_StdFunction* sender, int whichrow, bool wasDoubleClicked)
 	{
 		handleListBoxEvent(sender->getName(), whichrow, wasDoubleClicked);
 	};
 	
 	addAndMakeVisible(m_tablestdfunction1);
-	m_tablestdfunction1.onRowSelected = callback;
+	m_tablestdfunction1.onRowSelected = callback; // set the callback
 	m_tablestdfunction1.setName("std::function_listbox1");
 	addAndMakeVisible(m_tablestdfunction2);
-	m_tablestdfunction2.onRowSelected = callback;
+	m_tablestdfunction2.onRowSelected = callback; // set the callback
 	m_tablestdfunction2.setName("std::function_listbox2");
 
 	addAndMakeVisible(m_tablevalue1);
@@ -100,6 +98,13 @@ void MainComponent::changeListenerCallback(ChangeBroadcaster * cb)
 	{
 		handleListBoxEvent(listbox->getName(), listbox->selectedRow, listbox->wasDoubleClicked);
 	}
+	// Alternative implementation, but hmm, no, this really should not be used.
+	/*
+	if (cb == &m_table_changebroadcaster1)
+		handleListBoxEvent(m_table_changebroadcaster1.getName(), m_table_changebroadcaster1.selectedRow, m_table_changebroadcaster1.wasDoubleClicked);
+	if (cb == &m_table_changebroadcaster2)
+		handleListBoxEvent(m_table_changebroadcaster2.getName(), m_table_changebroadcaster2.selectedRow, m_table_changebroadcaster2.wasDoubleClicked);
+	*/
 }
 
 void MainComponent::listBoxRowSelected(ListBoxExample_Broadcaster* sender, int whichrow, bool wasDoubleClicked)
@@ -112,6 +117,7 @@ void MainComponent::valueChanged(Value & value)
 #if JUCE_CXX17_IS_AVAILABLE
 	auto[senderName, row, doubleClicked] = tuple_from_var_array<String, int, bool>(value);
 #else
+	// If can't use c++17 structured bindings, need to get the elements out individually like this from the Value
 	String senderName = value.getValue()[0];
 	int row = value.getValue()[1];
 	bool doubleClicked = value.getValue()[2];

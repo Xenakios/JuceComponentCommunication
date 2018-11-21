@@ -2,7 +2,10 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class ListBoxExample_Base : public Component, private ListBoxModel, public SettableTooltipClient
+/*
+Base class that has the ListBox component and implements drawing some bogus data into the listbox.
+*/
+class ListBoxExample_Base : public Component, private ListBoxModel
 {
 public:
 	ListBoxExample_Base()
@@ -55,7 +58,6 @@ public:
 	void removeListener(ListBoxExampleListener* l) { m_listeners.remove(l); }
 private:
 	ListenerList<ListBoxExampleListener> m_listeners;
-	
 	void listBoxItemDoubleClicked(int row, const MouseEvent&) override
 	{
 		sendMessagesToListeners(row, true);
@@ -73,6 +75,10 @@ private:
 		m_listeners.call(callback);
 	}
 };
+
+/*
+std::functions can only notify one listener but are a pretty good simple solution to the problem.
+*/
 
 class ListBoxExample_StdFunction : public ListBoxExample_Base
 {
@@ -95,6 +101,15 @@ private:
 	}
 };
 
+/*
+In order to hold multiple pieces of data in a Juce Value, Array<var> needs to be used.
+Here are some helper functions to deal with that.
+*/
+
+/*
+Makes an Array<var> from multiple values. The Ts types need to be compatible with Juce var.
+Things like Juce String, int, double, bool will work.
+*/ 
 template<typename... Ts>
 inline var make_var_array(Ts... values)
 {
@@ -102,20 +117,10 @@ inline var make_var_array(Ts... values)
 }
 
 #if JUCE_CXX17_IS_AVAILABLE
-template<typename... Ts>
-inline void values_from_var_array(var src, Ts&... values)
-{
-	jassert(src.isArray());
-	jassert(src.size() >= sizeof...(values));
-	int i = 0;
-	auto f = [&i,&src](auto& x) 
-	{ 
-		x = src[i]; 
-		++i; 
-	};
-	(f(values), ...);
-}
-
+/*
+Makes an std::tuple out of a Juce var that holds an array. Handy when C++17 structured bindings are available.
+Otherwise the array elements need to be manually gotten out of the var instance.
+*/
 template<typename... Ts>
 inline std::tuple<Ts...> tuple_from_var_array(var src)
 {
@@ -131,6 +136,11 @@ inline std::tuple<Ts...> tuple_from_var_array(var src)
 }
 #endif
 
+/*
+Juce's Value objects can be listened for changes but they unfortunately don't directly support
+passing multiple variables of interest. They can however hold an Array<var> and that can be (ab)used
+for our purposes.
+*/
 class ListBoxExample_Value : public ListBoxExample_Base
 {
 public:
@@ -147,6 +157,10 @@ public:
 	Value listValue;
 };
 
+/*
+Classic lazy way which couples the classes together. Only a MainComponent can receive the notifications this way.
+Methods that need to use the owner object need to go into a separate .cpp file that needs to include this header file.
+*/
 class MainComponent;
 
 class ListBoxExample_PassOwner : public ListBoxExample_Base
@@ -161,6 +175,13 @@ private:
 	MainComponent& m_maincomponent;
 };
 
+/*
+Kind of icky implementation. ChangeBroadcaster is used to do the notifications that something happened.
+The listener class can get the needed data by dynamic_casting the ChangeBroadcaster pointer
+into a pointer to an object of this class so that the wasDoubleClicked and selectedRow member variables can be read.
+Or, the changeListenerCallback implementation can check if the passed pointer is equal to some component's address and
+dispatch as required.
+*/
 class ListBoxExample_ChangeBroadcaster : public ListBoxExample_Base, public ChangeBroadcaster
 {
 public:
@@ -190,24 +211,26 @@ class MainComponent   : public Component,
 	public ChangeListener
 {
 public:
-    //==============================================================================
     MainComponent();
     ~MainComponent();
-
-    //==============================================================================
-    void paint (Graphics&) override;
+	
+	void paint (Graphics&) override;
     void resized() override;
+	
+	// This is directly called by ListBoxExample_PassOwners because they know about MainComponent
 	void tableRowChanged(ListBoxExample_PassOwner* sender, int row, bool wasDoubleClicked);
+	// Handles callbacks from ChangeBroadcaster
 	void changeListenerCallback(ChangeBroadcaster* cb) override;
-private:
-    void listBoxRowSelected(ListBoxExample_Broadcaster* sender, int whichrow, bool wasDoubleClicked) override;
+	// Handles callbacks from a ListBoxExample_Broadcaster
+	void listBoxRowSelected(ListBoxExample_Broadcaster* sender, int whichrow, bool wasDoubleClicked) override;
+	// Handles callbacks from a Value in the ListBoxExample_Value
 	void valueChanged(Value& value) override;
+private:
 	ListBoxExample_Broadcaster m_table_broadcaster1, m_table_broadcaster2;
 	ListBoxExample_StdFunction m_tablestdfunction1, m_tablestdfunction2;
 	ListBoxExample_Value m_tablevalue1, m_tablevalue2;
 	ListBoxExample_PassOwner m_table_passowner1, m_table_passowner2;
 	ListBoxExample_ChangeBroadcaster m_table_changebroadcaster1, m_table_changebroadcaster2;
-	Slider m_test1, m_test2, m_test3;
 	Label m_infolabel;
 	void handleListBoxEvent(String name, int row, bool wasDoubleClicked);
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
