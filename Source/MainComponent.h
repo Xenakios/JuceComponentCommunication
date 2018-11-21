@@ -39,8 +39,18 @@ protected:
 	}
 };
 
+/*
+A complicated way. A pair of broadcaster/listener classes is used like with the many JUCE provided
+Components. The benefit to this approach is that many listeners can be listening at once and some
+safety is provided thanks to the ListenerList.
+*/
+
 class ListBoxExample_Broadcaster;
 
+/* 
+Classes wanting to listen for the ListBoxExample_Broadcaster need to subclass this and implement
+the listBoxRowSelected method.
+*/
 class ListBoxExampleListener
 {
 public:
@@ -78,8 +88,10 @@ private:
 
 /*
 std::functions can only notify one listener but are a pretty good simple solution to the problem.
+The interested object can just assign a C++11 lambda on the onRowSelected member variable.
+There are possible object lifetime issues with this if the lambda captures a reference or a pointer 
+to an object that may be destroyed before this listbox implementation has done its callback.
 */
-
 class ListBoxExample_StdFunction : public ListBoxExample_Base
 {
 public:
@@ -161,7 +173,7 @@ public:
 Classic lazy way which couples the classes together. Only a MainComponent can receive the notifications this way.
 Methods that need to use the owner object need to go into a separate .cpp file that needs to include this header file.
 */
-class MainComponent;
+class MainComponent; // forward declare here because the actual MainComponent declaration becomes later in the header
 
 class ListBoxExample_PassOwner : public ListBoxExample_Base
 {
