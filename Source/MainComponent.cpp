@@ -16,6 +16,8 @@ MainComponent::MainComponent() :
 {
 	addAndMakeVisible(m_table_broadcaster1);
 	m_table_broadcaster1.addListener(this);
+	// Set component names for the involved components so can show human readable sender object names
+	// when the callbacks happen
 	m_table_broadcaster1.setName("broadcasterlistbox1"); 
 	addAndMakeVisible(m_table_broadcaster2);
 	m_table_broadcaster2.addListener(this);
@@ -44,7 +46,7 @@ MainComponent::MainComponent() :
 	addAndMakeVisible(m_table_passowner1);
 	m_table_passowner1.setName("passowner_listbox1");
 	addAndMakeVisible(m_table_passowner2);
-	m_table_passowner2.setName("passowner_listbox1");
+	m_table_passowner2.setName("passowner_listbox2");
 
 	addAndMakeVisible(m_table_changebroadcaster1);
 	m_table_changebroadcaster1.addChangeListener(this);
@@ -70,6 +72,7 @@ void MainComponent::paint (Graphics& g)
 
 void MainComponent::resized()
 {
+	// Just do some (bad) layouting for the listboxes
 	FlexBox flex(FlexBox::Direction::row,
 		FlexBox::Wrap::wrap,FlexBox::AlignContent::center,FlexBox::AlignItems::stretch, FlexBox::JustifyContent::flexStart);
 	flex.items.add(FlexItem(100.0, 300.0, m_table_broadcaster1));
@@ -86,15 +89,10 @@ void MainComponent::resized()
 	m_infolabel.setBounds(0, getHeight() - 30, getWidth(), 29);
 }
 
-void MainComponent::tableRowChanged(ListBoxExample_PassOwner * sender, int row, bool wasDoubleClicked)
-{
-	handleListBoxEvent(sender->getName(), row, wasDoubleClicked);
-}
-
 void MainComponent::changeListenerCallback(ChangeBroadcaster * cb)
 {
 	ListBoxExample_ChangeBroadcaster* listbox = dynamic_cast<ListBoxExample_ChangeBroadcaster*>(cb);
-	if (listbox != nullptr)
+	if (listbox != nullptr) // Check that the ChangeBroadcaster is our listbox thing
 	{
 		handleListBoxEvent(listbox->getName(), listbox->selectedRow, listbox->wasDoubleClicked);
 	}
@@ -127,6 +125,7 @@ void MainComponent::valueChanged(Value & value)
 
 void MainComponent::handleListBoxEvent(String senderName, int row, bool wasDoubleClicked)
 {
+	// Finally, we somehow got here with the needed infos
 	if (wasDoubleClicked)
 		m_infolabel.setText("Row " + String(row) + " was double clicked in : " + senderName, dontSendNotification);
 	else
@@ -135,10 +134,10 @@ void MainComponent::handleListBoxEvent(String senderName, int row, bool wasDoubl
 
 void ListBoxExample_PassOwner::listBoxItemDoubleClicked(int row, const MouseEvent &)
 {
-	m_maincomponent.tableRowChanged(this, row, true);
+	m_maincomponent.handleListBoxEvent(getName(), row, true);
 }
 
 void ListBoxExample_PassOwner::listBoxItemClicked(int row, const MouseEvent &)
 {
-	m_maincomponent.tableRowChanged(this, row, false);
+	m_maincomponent.handleListBoxEvent(getName(), row, false);
 }

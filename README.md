@@ -5,7 +5,7 @@ which row of the listbox was selected and if a mouse double click was involved.
 
 Techniques included :
 
--Broadcaster/Listener
+-Custom Broadcaster/Listener
 
 -std::function
 

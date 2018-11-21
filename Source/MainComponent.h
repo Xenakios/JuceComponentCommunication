@@ -217,14 +217,14 @@ public:
 	void paint (Graphics&) override;
     void resized() override;
 	
-	// This is directly called by ListBoxExample_PassOwners because they know about MainComponent
-	void tableRowChanged(ListBoxExample_PassOwner* sender, int row, bool wasDoubleClicked);
 	// Handles callbacks from ChangeBroadcaster
 	void changeListenerCallback(ChangeBroadcaster* cb) override;
 	// Handles callbacks from a ListBoxExample_Broadcaster
 	void listBoxRowSelected(ListBoxExample_Broadcaster* sender, int whichrow, bool wasDoubleClicked) override;
 	// Handles callbacks from a Value in the ListBoxExample_Value
 	void valueChanged(Value& value) override;
+	// This can be directly called by ListBoxExample_PassOwner instances because they know about MainComponent
+	void handleListBoxEvent(String name, int row, bool wasDoubleClicked);
 private:
 	ListBoxExample_Broadcaster m_table_broadcaster1, m_table_broadcaster2;
 	ListBoxExample_StdFunction m_tablestdfunction1, m_tablestdfunction2;
@@ -232,6 +232,5 @@ private:
 	ListBoxExample_PassOwner m_table_passowner1, m_table_passowner2;
 	ListBoxExample_ChangeBroadcaster m_table_changebroadcaster1, m_table_changebroadcaster2;
 	Label m_infolabel;
-	void handleListBoxEvent(String name, int row, bool wasDoubleClicked);
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
