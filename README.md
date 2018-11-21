@@ -14,5 +14,3 @@ Techniques included :
 -Making the listbox a ChangeBroadcaster and using a dynamic_cast to get access into the listbox variables
 
 -Passing a reference of the MainComponent into the listbox
-
--Polling with a Timer
