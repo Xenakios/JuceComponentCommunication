@@ -5,12 +5,12 @@ which row of the listbox was selected and if a mouse double click was involved.
 
 Techniques included :
 
--Custom Broadcaster/Listener
+- Custom Broadcaster/Listener
 
--std::function
+- std::function
 
--Value and Value::Listener
+- JUCE Value and Value::Listener
 
--Making the listbox a ChangeBroadcaster and using a dynamic_cast to get access into the listbox variables
+- Making the listbox a ChangeBroadcaster and using a dynamic_cast to get access into the listbox variables
 
--Passing a reference of the MainComponent into the listbox
+- Passing a reference of the MainComponent into the listbox so it can call a method directly
