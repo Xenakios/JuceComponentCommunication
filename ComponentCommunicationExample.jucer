@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="WYW2S5" name="ComponentCommunicationExample" projectType="guiapp"
-              jucerVersion="5.4.1" cppLanguageStandard="latest">
+              cppLanguageStandard="latest" addUsingNamespaceToJuceHeader="0"
+              jucerFormatVersion="1">
   <MAINGROUP id="pQUB4m" name="ComponentCommunicationExample">
     <GROUP id="{49855DF7-6822-B017-F451-9881CC439D80}" name="Source">
       <FILE id="C0QQLi" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
@@ -49,6 +50,25 @@
         <MODULEPATH id="juce_gui_extra" path="../../gitrepos/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\develop\juce_clap_host\libs\JUCE\modules"/>
+      </MODULEPATHS>
+    </VS2022>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

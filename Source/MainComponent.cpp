@@ -65,31 +65,31 @@ MainComponent::~MainComponent()
 }
 
 //==============================================================================
-void MainComponent::paint (Graphics& g)
+void MainComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
 void MainComponent::resized()
 {
 	// Just do some (bad) layouting for the listboxes
-	FlexBox flex(FlexBox::Direction::row,
-		FlexBox::Wrap::wrap,FlexBox::AlignContent::center,FlexBox::AlignItems::stretch, FlexBox::JustifyContent::flexStart);
-	flex.items.add(FlexItem(100.0, 300.0, m_table_broadcaster1));
-	flex.items.add(FlexItem(100.0, 100.0, m_table_broadcaster2));
-	flex.items.add(FlexItem(100.0, 100.0, m_tablestdfunction1));
-	flex.items.add(FlexItem(100.0, 100.0, m_tablestdfunction2));
-	flex.items.add(FlexItem(100.0, 100.0, m_tablevalue1));
-	flex.items.add(FlexItem(100.0, 100.0, m_tablevalue2));
-	flex.items.add(FlexItem(100.0, 100.0, m_table_passowner1));
-	flex.items.add(FlexItem(100.0, 100.0, m_table_passowner2));
-	flex.items.add(FlexItem(100.0, 100.0, m_table_changebroadcaster1));
-	flex.items.add(FlexItem(100.0, 100.0, m_table_changebroadcaster2));
+	juce::FlexBox flex(juce::FlexBox::Direction::row,
+		juce::FlexBox::Wrap::wrap, juce::FlexBox::AlignContent::center, juce::FlexBox::AlignItems::stretch, juce::FlexBox::JustifyContent::flexStart);
+	flex.items.add(juce::FlexItem(100.0, 300.0, m_table_broadcaster1));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_table_broadcaster2));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_tablestdfunction1));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_tablestdfunction2));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_tablevalue1));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_tablevalue2));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_table_passowner1));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_table_passowner2));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_table_changebroadcaster1));
+	flex.items.add(juce::FlexItem(100.0, 100.0, m_table_changebroadcaster2));
 	flex.performLayout(getLocalBounds());
 	m_infolabel.setBounds(0, getHeight() - 30, getWidth(), 29);
 }
 
-void MainComponent::changeListenerCallback(ChangeBroadcaster * cb)
+void MainComponent::changeListenerCallback(juce::ChangeBroadcaster * cb)
 {
 	ListBoxExample_ChangeBroadcaster* listbox = dynamic_cast<ListBoxExample_ChangeBroadcaster*>(cb);
 	if (listbox != nullptr) // Check that the ChangeBroadcaster is our listbox thing
@@ -110,34 +110,34 @@ void MainComponent::listBoxRowSelected(ListBoxExample_Broadcaster* sender, int w
 	handleListBoxEvent(sender->getName(), whichrow, wasDoubleClicked);
 }
 
-void MainComponent::valueChanged(Value & value)
+void MainComponent::valueChanged(juce::Value & value)
 {
 #if JUCE_CXX17_IS_AVAILABLE
-	auto[senderName, row, doubleClicked] = tuple_from_var_array<String, int, bool>(value);
+	auto[senderName, row, doubleClicked] = tuple_from_var_array<juce::String, int, bool>(value);
 #else
 	// If can't use c++17 structured bindings, need to get the elements out individually like this from the Value
-	String senderName = value.getValue()[0];
+	juce::String senderName = value.getValue()[0];
 	int row = value.getValue()[1];
 	bool doubleClicked = value.getValue()[2];
 #endif
 	handleListBoxEvent(senderName, row, doubleClicked);
 }
 
-void MainComponent::handleListBoxEvent(String senderName, int row, bool wasDoubleClicked)
+void MainComponent::handleListBoxEvent(juce::String senderName, int row, bool wasDoubleClicked)
 {
 	// Finally, we somehow got here with the needed infos
 	if (wasDoubleClicked)
-		m_infolabel.setText("Row " + String(row) + " was double clicked in : " + senderName, dontSendNotification);
+		m_infolabel.setText("Row " + juce::String(row) + " was double clicked in : " + senderName, juce::dontSendNotification);
 	else
-		m_infolabel.setText("Row " + String(row) + " was clicked in : " + senderName, dontSendNotification);
+		m_infolabel.setText("Row " + juce::String(row) + " was clicked in : " + senderName, juce::dontSendNotification);
 }
 
-void ListBoxExample_PassOwner::listBoxItemDoubleClicked(int row, const MouseEvent &)
+void ListBoxExample_PassOwner::listBoxItemDoubleClicked(int row, const juce::MouseEvent &)
 {
 	m_maincomponent.handleListBoxEvent(getName(), row, true);
 }
 
-void ListBoxExample_PassOwner::listBoxItemClicked(int row, const MouseEvent &)
+void ListBoxExample_PassOwner::listBoxItemClicked(int row, const juce::MouseEvent &)
 {
 	m_maincomponent.handleListBoxEvent(getName(), row, false);
 }

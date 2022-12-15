@@ -5,7 +5,7 @@
 /*
 Base class that has the ListBox component and implements drawing some bogus data into the listbox.
 */
-class ListBoxExample_Base : public Component, private ListBoxModel
+class ListBoxExample_Base : public juce::Component, private juce::ListBoxModel
 {
 public:
 	ListBoxExample_Base()
@@ -15,23 +15,23 @@ public:
 	}
 	
 protected:
-	ListBox m_listbox;
+	juce::ListBox m_listbox;
 	int getNumRows() override
 	{
 		return 100;
 	}
-	void paintListBoxItem(int rowNumber, Graphics & g, int width, int height, bool rowIsSelected) override
+	void paintListBoxItem(int rowNumber, juce::Graphics & g, int width, int height, bool rowIsSelected) override
 	{
 		if (rowIsSelected)
 		{
-			g.fillAll(Colours::blue);
+			g.fillAll(juce::Colours::blue);
 		}
 		else
 		{
-			g.fillAll(Colours::black);
+			g.fillAll(juce::Colours::black);
 		}
-		g.setColour(Colours::white);
-		g.drawText(String(rowNumber), 0, 0, width, height, Justification::centredLeft);
+		g.setColour(juce::Colours::white);
+		g.drawText(juce::String(rowNumber), 0, 0, width, height, juce::Justification::centredLeft);
 	}
 	void resized() override
 	{
@@ -67,12 +67,12 @@ public:
 	void addListener(ListBoxExampleListener* l) { m_listeners.add(l); }
 	void removeListener(ListBoxExampleListener* l) { m_listeners.remove(l); }
 private:
-	ListenerList<ListBoxExampleListener> m_listeners;
-	void listBoxItemDoubleClicked(int row, const MouseEvent&) override
+	juce::ListenerList<ListBoxExampleListener> m_listeners;
+	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override
 	{
 		sendMessagesToListeners(row, true);
 	}
-	void listBoxItemClicked(int row, const MouseEvent&) override
+	void listBoxItemClicked(int row, const juce::MouseEvent&) override
 	{
 		sendMessagesToListeners(row, false);
 	}
@@ -101,12 +101,12 @@ public:
 	}
 	std::function<void(ListBoxExample_StdFunction*, int, bool)> onRowSelected;
 private:
-	void listBoxItemDoubleClicked(int row, const MouseEvent&) override
+	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override
 	{
 		if (onRowSelected) // check that the callback function has been set
 			onRowSelected(this, row, true);
 	}
-	void listBoxItemClicked(int row, const MouseEvent&) override
+	void listBoxItemClicked(int row, const juce::MouseEvent&) override
 	{
 		if (onRowSelected) // check that the callback function has been set
 			onRowSelected(this, row, false);
@@ -123,9 +123,9 @@ Makes an Array<var> from multiple values. The Ts types need to be compatible wit
 Things like Juce String, int, double, bool will work.
 */ 
 template<typename... Ts>
-inline var make_var_array(Ts... values)
+inline juce::var make_var_array(Ts... values)
 {
-	return Array<var>(values...);
+	return juce::Array<juce::var>(values...);
 }
 
 #if JUCE_CXX17_IS_AVAILABLE
@@ -134,7 +134,7 @@ Makes an std::tuple out of a Juce var that holds an array. Handy when C++17 stru
 Otherwise the array elements need to be manually gotten out of the var instance.
 */
 template<typename... Ts>
-inline std::tuple<Ts...> tuple_from_var_array(var src)
+inline std::tuple<Ts...> tuple_from_var_array(juce::var src)
 {
 	// Check source is a var containing an array and that the size matches with the number of types requested
 	jassert(src.isArray() && src.size() == sizeof...(Ts));
@@ -158,15 +158,15 @@ class ListBoxExample_Value : public ListBoxExample_Base
 public:
 	ListBoxExample_Value() : ListBoxExample_Base()
 	{}
-	void listBoxItemDoubleClicked(int row, const MouseEvent&) override
+	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override
 	{
 		listValue = make_var_array(getName(), row, true);
 	}
-	void listBoxItemClicked(int row, const MouseEvent&) override
+	void listBoxItemClicked(int row, const juce::MouseEvent&) override
 	{
 		listValue = make_var_array(getName(), row, false);
 	}
-	Value listValue;
+	juce::Value listValue;
 };
 
 /*
@@ -181,8 +181,8 @@ public:
 	ListBoxExample_PassOwner(MainComponent& mc) : ListBoxExample_Base(), m_maincomponent(mc) 
 	{}
 	// Because of forward declaration for MainComponent, the implementations need to go into the .cpp file
-	void listBoxItemDoubleClicked(int row, const MouseEvent&) override;
-	void listBoxItemClicked(int row, const MouseEvent&) override;
+	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
+	void listBoxItemClicked(int row, const juce::MouseEvent&) override;
 private:
 	MainComponent& m_maincomponent;
 };
@@ -194,20 +194,20 @@ into a pointer to an object of this class so that the wasDoubleClicked and selec
 Or, the changeListenerCallback implementation can check if the passed pointer is equal to some component's address and
 dispatch as required.
 */
-class ListBoxExample_ChangeBroadcaster : public ListBoxExample_Base, public ChangeBroadcaster
+class ListBoxExample_ChangeBroadcaster : public ListBoxExample_Base, public juce::ChangeBroadcaster
 {
 public:
 	ListBoxExample_ChangeBroadcaster() : ListBoxExample_Base()
 	{
 		
 	}
-	void listBoxItemDoubleClicked(int row, const MouseEvent&) override
+	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override
 	{
 		wasDoubleClicked = true;
 		selectedRow = row;
 		sendChangeMessage();
 	}
-	void listBoxItemClicked(int row, const MouseEvent&) override
+	void listBoxItemClicked(int row, const juce::MouseEvent&) override
 	{
 		wasDoubleClicked = false;
 		selectedRow = row;
@@ -217,32 +217,32 @@ public:
 	bool wasDoubleClicked = false;
 };
 
-class MainComponent   : public Component, 
+class MainComponent   : public juce::Component,
 	public ListBoxExampleListener,
-	public Value::Listener,
-	public ChangeListener
+	public juce::Value::Listener,
+	public juce::ChangeListener
 {
 public:
     MainComponent();
     ~MainComponent();
 	
-	void paint (Graphics&) override;
+	void paint (juce::Graphics&) override;
     void resized() override;
 	
 	// Handles callbacks from ChangeBroadcaster
-	void changeListenerCallback(ChangeBroadcaster* cb) override;
+	void changeListenerCallback(juce::ChangeBroadcaster* cb) override;
 	// Handles callbacks from a ListBoxExample_Broadcaster
 	void listBoxRowSelected(ListBoxExample_Broadcaster* sender, int whichrow, bool wasDoubleClicked) override;
 	// Handles callbacks from a Value in the ListBoxExample_Value
-	void valueChanged(Value& value) override;
+	void valueChanged(juce::Value& value) override;
 	// This can be directly called by ListBoxExample_PassOwner instances because they know about MainComponent
-	void handleListBoxEvent(String name, int row, bool wasDoubleClicked);
+	void handleListBoxEvent(juce::String name, int row, bool wasDoubleClicked);
 private:
 	ListBoxExample_Broadcaster m_table_broadcaster1, m_table_broadcaster2;
 	ListBoxExample_StdFunction m_tablestdfunction1, m_tablestdfunction2;
 	ListBoxExample_Value m_tablevalue1, m_tablevalue2;
 	ListBoxExample_PassOwner m_table_passowner1, m_table_passowner2;
 	ListBoxExample_ChangeBroadcaster m_table_changebroadcaster1, m_table_changebroadcaster2;
-	Label m_infolabel;
+	juce::Label m_infolabel;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
